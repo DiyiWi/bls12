@@ -21,60 +21,61 @@
  */
 
 /**
- * @defgroup rand Pseudo-random number generator.
- */
-
-/**
  * @file
  *
- * Interface of the module for pseudo-random number generation.
+ * Interface of the tracing functions.
  *
  * @version $Id$
- * @ingroup rand
+ * @ingroup relic
  */
 
-#ifndef RELIC_RAND_H
-#define RELIC_RAND_H
+#ifndef RELIC_TRACE_H
+#define RELIC_TRACE_H
 
 /*============================================================================*/
-/* Constant definitions                                                       */
+/* Macro definitions                                                          */
 /*============================================================================*/
+
+#ifdef TRACE
 
 /**
- * Size of the PRNG internal state in bytes.
+ * Renames the tracing routine called when a function is called to the compiler
+ * specific function.
  */
-#define RAND_SIZE	    64
+#define trace_enter	__cyg_profile_func_enter
+
+/**
+ * Renames the tracing routine called when a function returns to the compiler
+ * specific function.
+ */
+#define trace_exit	__cyg_profile_func_exit
+
+#endif
 
 /*============================================================================*/
 /* Function prototypes                                                        */
 /*============================================================================*/
 
-/**
- * Initializes the pseudo-random number generator.
- */
-void rand_init(void);
+#ifdef TRACE
 
 /**
- * Finishes the pseudo-random number generator.
+ * Prints the name of the function begin called for tracing purposes.
+ *
+ * @param[in] this		- the function address.
+ * @param[in] from		- address of the caller function.
  */
-void rand_clean(void);
+void trace_enter(void *this, void *from)
+		__attribute__ ((no_instrument_function));
 
 /**
- * Sets the initial state of the pseudo-random number generator.
- * 
- * @param[in] buf			- the buffer that represents the initial state.
- * @param[in] size			- the number of bytes.
+ * Prints the name of the function begin returned for tracing purposes.
+ *
+ * @param[in] this		- the function address.
+ * @param[in] from		- address of the caller function.
  */
-void rand_seed(unsigned char *buf, int size);
+void trace_exit(void *this, void *from)
+		__attribute__ ((no_instrument_function));
 
-/**
- * Writes size pseudo-random bytes in the passed buffer.
- * 
- * @param[out] buf			- the buffer to write.
- * @param[in] size			- the number of bytes to write.
- * @throw ERR_NO_READ		- it the pseudo-random number generator can't
- * 							generate the specified number of bytes.
- */
-void rand_bytes(unsigned char *buf, int size);
+#endif
 
-#endif /* !RELIC_RAND_H */
+#endif /* !RELIC_TRACE_H */
